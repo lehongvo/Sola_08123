@@ -1,14 +1,17 @@
-import { mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
+import {
+  createNft,
+  fetchDigitalAsset,
+  mplTokenMetadata,
+} from "@metaplex-foundation/mpl-token-metadata";
 import {
   generateSigner,
   keypairIdentity,
-  KeypairSigner,
   percentAmount,
-  Umi,
 } from "@metaplex-foundation/umi";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import {
   airdropIfRequired,
+  getExplorerLink,
   getKeypairFromEnvironment,
 } from "@solana-developers/helpers";
 import { clusterApiUrl, Connection, LAMPORTS_PER_SOL } from "@solana/web3.js";
@@ -42,11 +45,23 @@ const createCollection = async () => {
       mint: collectionMint,
       name: "VincentVO",
       symbol: "VO",
-      uri: "https://nftdata.parallelnft.com/api/parallel-avatars/ipfs/4163",
+      uri: "https://raw.githubusercontent.com/solana-developers/professional-education/main/labs/sample-nft-collection-offchain-data.json",
       sellerFeeBasisPoints: percentAmount(0),
       isCollection: true,
     });
     await transaction.sendAndConfirm(umi);
+
+    const createdCollectionNft = await fetchDigitalAsset(
+      umi,
+      collectionMint.publicKey
+    );
+    console.log(
+      `Created Collection 📦! Address is ${getExplorerLink(
+        "address",
+        createdCollectionNft.mint.publicKey,
+        "devnet"
+      )}`
+    );
   } catch (error) {
     console.error("\n❌ Error creating collection:");
     if (error instanceof Error) {
@@ -58,18 +73,4 @@ const createCollection = async () => {
   }
 };
 
-// Execute main function
 createCollection();
-function createNft(
-  umi: Umi,
-  arg1: {
-    mint: KeypairSigner;
-    name: string;
-    symbol: string;
-    uri: string;
-    sellerFeeBasisPoints: any;
-    isCollection: boolean;
-  }
-) {
-  throw new Error("Function not implemented.");
-}
