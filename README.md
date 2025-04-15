@@ -1,40 +1,96 @@
-bash
-Copy code
-ssh -T git@github-metatech
-Kiểm tra kết nối cho email volh@smartosc.com:
+# legacy-next-tailwind-counter
 
-bash
-Copy code
-ssh -T git@github-smartosc
-Kiểm tra kết nối cho email lehongvi19x@gmail.com:
+## Getting Started
 
-bash
-Copy code
-ssh -T git@github-bap
-Kiểm tra kết nối cho email volh@bap.jp:
+### Prerequisites
 
+- Node v18.18.0 or higher
 
-git config --global user.name "vincentVo"
-git config --global user.email "volh@bap.jp"
+- Rust v1.77.2 or higher
+- Anchor CLI 0.30.1 or higher
+- Solana CLI 1.18.17 or higher
 
-git config --global user.name "vincentVo"
-git config --global user.email "volh@smartosc.com"
+### Installation
 
-git config --global user.name "vincentVo"
-git config --global user.email "lehongvi19x@gmail.com"
+#### Clone the repo
 
+```shell
+git clone <repo-url>
+cd <repo-name>
+```
 
-ssh-add -D # Delete all key
-ssh-add ~/.ssh/id_rsa_smartosc
-git config --global user.name "vincentVo"
-git config --global user.email "volh@smartosc.com"
+#### Install Dependencies
 
-ssh-add -D # Delete all key
-ssh-add ~/.ssh/id_rsa_bap
-git config --global user.name "vincentVo"
-git config --global user.email "volh@smartosc.com"
+```shell
+pnpm install
+```
 
-ssh-add -D # Delete all key
-ssh-add ~/.ssh/id_rsa_gmail
-git config --global user.name "vincentVo"
-git config --global user.email "volh@smartosc.com"
+#### Start the web app
+
+```
+pnpm dev
+```
+
+## Apps
+
+### anchor
+
+This is a Solana program written in Rust using the Anchor framework.
+
+#### Commands
+
+You can use any normal anchor commands. Either move to the `anchor` directory and run the `anchor` command or prefix the
+command with `pnpm`, eg: `pnpm anchor`.
+
+#### Sync the program id:
+
+Running this command will create a new keypair in the `anchor/target/deploy` directory and save the address to the
+Anchor config file and update the `declare_id!` macro in the `./src/lib.rs` file of the program.
+
+You will manually need to update the constant in `anchor/lib/counter-exports.ts` to match the new program id.
+
+```shell
+pnpm anchor keys sync
+```
+
+#### Build the program:
+
+```shell
+pnpm anchor-build
+```
+
+#### Start the test validator with the program deployed:
+
+```shell
+pnpm anchor-localnet
+```
+
+#### Run the tests
+
+```shell
+pnpm anchor-test
+```
+
+#### Deploy to Devnet
+
+```shell
+pnpm anchor deploy --provider.cluster devnet
+```
+
+### web
+
+This is a React app that uses the Anchor generated client to interact with the Solana program.
+
+#### Commands
+
+Start the web app
+
+```shell
+pnpm dev
+```
+
+Build the web app
+
+```shell
+pnpm build
+```
