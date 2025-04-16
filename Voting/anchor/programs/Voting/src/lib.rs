@@ -1,7 +1,6 @@
 #![allow(clippy::result_large_err)]
 
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::system_program;
 
 declare_id!("coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF");
 
@@ -43,6 +42,7 @@ pub mod voting {
     pub fn vote(ctx: Context<Vote>, _poll_id: u64, candidate_id: u64) -> Result<()> {
         let poll = &mut ctx.accounts.poll_account;
         let candidate = &mut ctx.accounts.candidate_account;
+        let vote_record = &mut ctx.accounts.vote_record;
         
         let current_time = Clock::get()?.unix_timestamp as u64;
         if poll.poll_start_time > current_time {
@@ -62,16 +62,14 @@ pub mod voting {
         }
 
         // Check if user has already voted
-        let voter_key = ctx.accounts.payer.key();
-        let vote_seed = format!("vote-{}-{}", poll.poll_id, voter_key);
-        let (vote_account, _) = Pubkey::find_program_address(
-            &[vote_seed.as_bytes()],
-            ctx.program_id
-        );
-        
-        if vote_account == ctx.accounts.payer.key() {
+        if vote_record.voter == ctx.accounts.payer.key() {
             return Err(ErrorCode::AlreadyVoted.into());
         }
+
+        // Record the vote
+        vote_record.poll_id = poll.poll_id;
+        vote_record.voter = ctx.accounts.payer.key();
+        vote_record.voted_at = current_time;
 
         poll.total_votes += 1;
         candidate.candidate_votes += 1;
@@ -140,6 +138,15 @@ pub struct Vote<'info> {
     )]
     pub candidate_account: Account<'info, Candidate>,
 
+    #[account(
+        init,
+        payer = payer,
+        space = 8 + VoteRecord::INIT_SPACE,
+        seeds = [b"vote".as_ref(), poll_id.to_string().as_bytes(), payer.key().as_ref()],
+        bump,
+    )]
+    pub vote_record: Account<'info, VoteRecord>,
+
     pub system_program: Program<'info, System>,
 }
 
@@ -168,6 +175,14 @@ pub struct Candidate {
     #[max_len(256)]
     pub candidate_description: String,
     pub candidate_votes: u16,
+}
+
+#[account]
+#[derive(InitSpace)]
+pub struct VoteRecord {
+    pub poll_id: u64,
+    pub voter: Pubkey,
+    pub voted_at: u64,
 }
 
 #[error_code]
