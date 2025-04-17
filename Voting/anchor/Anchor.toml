@@ -6,18 +6,19 @@ resolution = true
 skip-lint = false
 seeds = false
 
-[programs.localnet]
-voting = "coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF"
+[programs.devnet]
+voting = "3bMs6aKSfpJKnm5yHSkoi9hu99Pcvh1yHK5w7RpopRKV"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
-wallet = "~/.config/solana/id.json"
+cluster = "Devnet"
+wallet = "./id.json"
 
 [scripts]
 test = "cargo test-bpf"
+deploy = "ts-node migrations/deploy.ts"
 
 [test]
 startup_wait = 5000

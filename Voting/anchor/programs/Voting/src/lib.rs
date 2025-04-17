@@ -2,7 +2,7 @@
 
 use anchor_lang::prelude::*;
 
-declare_id!("coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF");
+declare_id!("3bMs6aKSfpJKnm5yHSkoi9hu99Pcvh1yHK5w7RpopRKV");
 
 const START_POLL_SEED: usize = 8;
 const START_CANDIDATE_SEED: usize = 8;
