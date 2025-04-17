@@ -11,7 +11,14 @@ const START_CANDIDATE_SEED: usize = 8;
 pub mod voting {
     use super::*;
 
-    pub fn initialize_poll(ctx: Context<InitializePoll>, poll_id: u64, poll_name: String, poll_description: String, poll_start_time: u64, poll_end_time: u64) -> Result<()> {
+    pub fn initialize_poll(
+        ctx: Context<InitializePoll>,
+        poll_id: u64,
+        poll_name: String,
+        poll_description: String,
+        poll_start_time: u64,
+        poll_end_time: u64,
+    ) -> Result<()> {
         let poll = &mut ctx.accounts.poll_account;
         poll.poll_id = poll_id;
         poll.poll_name = poll_name;
@@ -23,7 +30,12 @@ pub mod voting {
         Ok(())
     }
 
-    pub fn initialize_candidate(ctx: Context<InitializeCandidate>, candidate_id: u64, candidate_name: String, candidate_description: String) -> Result<()> {
+    pub fn initialize_candidate(
+        ctx: Context<InitializeCandidate>,
+        candidate_id: u64,
+        candidate_name: String,
+        candidate_description: String,
+    ) -> Result<()> {
         let candidate = &mut ctx.accounts.candidate_account;
         candidate.candidate_id = candidate_id;
         candidate.candidate_name = candidate_name;
@@ -43,7 +55,7 @@ pub mod voting {
         let poll = &mut ctx.accounts.poll_account;
         let candidate = &mut ctx.accounts.candidate_account;
         let vote_record = &mut ctx.accounts.vote_record;
-        
+
         let current_time = Clock::get()?.unix_timestamp as u64;
         if poll.poll_start_time > current_time {
             return Err(ErrorCode::PollNotStarted.into());
