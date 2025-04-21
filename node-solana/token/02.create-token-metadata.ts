@@ -1,32 +1,38 @@
 // This uses "@metaplex-foundation/mpl-token-metadata@2" to create tokens
-import "dotenv/config";
 import {
-  getKeypairFromEnvironment,
+  createCreateMetadataAccountV3Instruction,
+  DataV2,
+} from "@metaplex-foundation/mpl-token-metadata";
+import {
   getExplorerLink,
+  getKeypairFromEnvironment,
 } from "@solana-developers/helpers";
 import {
-  Connection,
   clusterApiUrl,
+  Connection,
   PublicKey,
-  Transaction,
   sendAndConfirmTransaction,
+  Transaction,
 } from "@solana/web3.js";
-import pkg from '@metaplex-foundation/mpl-token-metadata';
-const { createCreateMetadataAccountV3Instruction } = pkg;
+import "dotenv/config";
 
 // Constants
-const METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
-const TOKEN_MINT_ADDRESS = new PublicKey("6zZxyDP8S85LcYdvTjJFMs7Vtg8diUtuSDWG38vDS32V");
+const METADATA_PROGRAM_ID = new PublicKey(
+  "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+);
+const TOKEN_MINT_ADDRESS = new PublicKey(
+  "Cfr7YnLJj3US27WCSwERBJvtKaDsVJ1YPSkzigSsHuFM"
+);
 
 // Token metadata configuration
-const TOKEN_METADATA = {
+const TOKEN_METADATA: DataV2 = {
   name: "VincentVo02",
   symbol: "VVO02",
   uri: "https://raw.githubusercontent.com/mikemaccana/token-command-line/main/metadata.json",
   sellerFeeBasisPoints: 0,
   creators: null,
   collection: null,
-  uses: null
+  uses: null,
 };
 
 /**
@@ -68,18 +74,10 @@ const createMetadataInstruction = (
     },
     {
       createMetadataAccountArgsV3: {
-        data: {
-          name: TOKEN_METADATA.name,
-          symbol: TOKEN_METADATA.symbol,
-          uri: TOKEN_METADATA.uri,
-          sellerFeeBasisPoints: TOKEN_METADATA.sellerFeeBasisPoints,
-          creators: TOKEN_METADATA.creators,
-          collection: TOKEN_METADATA.collection,
-          uses: TOKEN_METADATA.uses
-        },
+        data: TOKEN_METADATA,
         isMutable: true,
-        collectionDetails: null
-      }
+        collectionDetails: null,
+      },
     }
   );
 };
@@ -93,9 +91,7 @@ const main = async () => {
     const connection = new Connection(clusterApiUrl("devnet"));
     const user = getKeypairFromEnvironment("SECRET_KEY");
 
-    console.log(
-      `🔑 Using keypair: ${user.publicKey.toBase58()}`
-    );
+    console.log(`🔑 Using keypair: ${user.publicKey.toBase58()}`);
 
     // Derive metadata PDA
     const metadataPDA = deriveMetadataPDA(TOKEN_MINT_ADDRESS);
@@ -106,20 +102,25 @@ const main = async () => {
       createMetadataInstruction(metadataPDA, TOKEN_MINT_ADDRESS, user.publicKey)
     );
 
-    const signature = await sendAndConfirmTransaction(
-      connection,
-      transaction,
-      [user]
-    );
+    const signature = await sendAndConfirmTransaction(connection, transaction, [
+      user,
+    ]);
 
     // Log results
     console.log(
-      `✅ Metadata created! View transaction: ${getExplorerLink("transaction", signature, "devnet")}`
+      `✅ Metadata created! View transaction: ${getExplorerLink(
+        "transaction",
+        signature,
+        "devnet"
+      )}`
     );
     console.log(
-      `🪙 View token: ${getExplorerLink("address", TOKEN_MINT_ADDRESS.toString(), "devnet")}`
+      `🪙 View token: ${getExplorerLink(
+        "address",
+        TOKEN_MINT_ADDRESS.toString(),
+        "devnet"
+      )}`
     );
-
   } catch (error) {
     console.error("❌ Error creating metadata:", error);
     process.exit(1);
