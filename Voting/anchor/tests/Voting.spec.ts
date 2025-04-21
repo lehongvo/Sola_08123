@@ -1,9 +1,9 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { Keypair, PublicKey } from "@solana/web3.js";
-import { Voting } from "../target/types/Voting";
-import { expect } from "chai";
+import { PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
+import { expect } from "chai";
+import { Voting } from "../target/types/Voting";
 
 describe("Voting", () => {
   // Configure the client to use the local cluster.
@@ -26,7 +26,7 @@ describe("Voting", () => {
   it("Initialize Poll", async () => {
     const [pollPda] = PublicKey.findProgramAddressSync(
       [Buffer.from("poll"), Buffer.from(pollId.toString())],
-      program.programId,
+      program.programId
     );
 
     await program.methods
@@ -35,13 +35,13 @@ describe("Voting", () => {
         pollName,
         pollDescription,
         pollStartTime,
-        pollEndTime,
+        pollEndTime
       )
       .accounts({
         pollAccount: pollPda,
         payer: payer.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
-      })
+      } as any)
       .rpc();
 
     const pollAccount = await program.account.poll.fetch(pollPda);
@@ -49,7 +49,7 @@ describe("Voting", () => {
     expect(pollAccount.pollName).to.equal(pollName);
     expect(pollAccount.pollDescription).to.equal(pollDescription);
     expect(pollAccount.pollStartTime.toString()).to.equal(
-      pollStartTime.toString(),
+      pollStartTime.toString()
     );
     expect(pollAccount.pollEndTime.toString()).to.equal(pollEndTime.toString());
     expect(pollAccount.pollIsFinished).to.be.false;
@@ -59,11 +59,11 @@ describe("Voting", () => {
   it("Initialize Candidate", async () => {
     const [pollPda] = PublicKey.findProgramAddressSync(
       [Buffer.from("poll"), Buffer.from(pollId.toString())],
-      program.programId,
+      program.programId
     );
     const [candidatePda] = PublicKey.findProgramAddressSync(
       [Buffer.from(pollId.toString()), Buffer.from(candidateId.toString())],
-      program.programId,
+      program.programId
     );
 
     await program.methods
@@ -73,17 +73,17 @@ describe("Voting", () => {
         candidateAccount: candidatePda,
         payer: payer.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
-      })
+      } as any)
       .rpc();
 
     const candidateAccount =
       await program.account.candidate.fetch(candidatePda);
     expect(candidateAccount.candidateId.toString()).to.equal(
-      candidateId.toString(),
+      candidateId.toString()
     );
     expect(candidateAccount.candidateName).to.equal(candidateName);
     expect(candidateAccount.candidateDescription).to.equal(
-      candidateDescription,
+      candidateDescription
     );
     expect(candidateAccount.candidateVotes.toString()).to.equal("0");
   });
@@ -91,11 +91,11 @@ describe("Voting", () => {
   it("Vote for Candidate", async () => {
     const [pollPda] = PublicKey.findProgramAddressSync(
       [Buffer.from("poll"), Buffer.from(pollId.toString())],
-      program.programId,
+      program.programId
     );
     const [candidatePda] = PublicKey.findProgramAddressSync(
       [Buffer.from(pollId.toString()), Buffer.from(candidateId.toString())],
-      program.programId,
+      program.programId
     );
     const [voteRecordPda] = PublicKey.findProgramAddressSync(
       [
@@ -103,7 +103,7 @@ describe("Voting", () => {
         Buffer.from(pollId.toString()),
         payer.publicKey.toBuffer(),
       ],
-      program.programId,
+      program.programId
     );
 
     await program.methods
@@ -114,7 +114,7 @@ describe("Voting", () => {
         voteRecord: voteRecordPda,
         payer: payer.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
-      })
+      } as any)
       .rpc();
 
     const pollAccount = await program.account.poll.fetch(pollPda);
@@ -131,11 +131,11 @@ describe("Voting", () => {
   it("Cannot vote twice", async () => {
     const [pollPda] = PublicKey.findProgramAddressSync(
       [Buffer.from("poll"), Buffer.from(pollId.toString())],
-      program.programId,
+      program.programId
     );
     const [candidatePda] = PublicKey.findProgramAddressSync(
       [Buffer.from(pollId.toString()), Buffer.from(candidateId.toString())],
-      program.programId,
+      program.programId
     );
     const [voteRecordPda] = PublicKey.findProgramAddressSync(
       [
@@ -143,7 +143,7 @@ describe("Voting", () => {
         Buffer.from(pollId.toString()),
         payer.publicKey.toBuffer(),
       ],
-      program.programId,
+      program.programId
     );
 
     try {
@@ -155,7 +155,7 @@ describe("Voting", () => {
           voteRecord: voteRecordPda,
           payer: payer.publicKey,
           systemProgram: anchor.web3.SystemProgram.programId,
-        })
+        } as any)
         .rpc();
       expect.fail("Expected error was not thrown");
     } catch (err) {
